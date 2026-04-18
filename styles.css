@@ -55,7 +55,7 @@ button {
 }
 
 .app-header {
-  padding-bottom: 12px;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -162,6 +162,10 @@ button {
 
 .setup-topline p {
   margin-top: 6px;
+}
+
+.helper-copy {
+  font-size: 13px;
 }
 
 .osrs-shop-window {
@@ -274,16 +278,26 @@ button {
   min-height: 118px;
   padding: 22px 8px 10px;
   border: 2px solid #6b5b46;
-  background: linear-gradient(180deg, #342c21, #201912 34%, #19130e);
+  background: #241d16;
   color: var(--text);
   cursor: pointer;
   box-shadow: inset 0 0 0 1px #100c09;
+  transform: translateZ(0);
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    background-color 140ms ease;
 }
 
 .osrs-stock-slot.selected .osrs-stock-slot-button {
   border-color: #89d36f;
-  background: linear-gradient(180deg, #38412a, #222117 34%, #19130e);
-  box-shadow: inset 0 0 0 1px rgba(121, 212, 111, 0.2), 0 0 10px rgba(121, 212, 111, 0.12);
+  background: #263120;
+  box-shadow: inset 0 0 0 1px rgba(121, 212, 111, 0.2);
+}
+
+.osrs-stock-slot-button:hover {
+  transform: translateY(-1px);
 }
 
 .osrs-slot-stock,
@@ -386,6 +400,7 @@ button {
   padding: 10px;
   border: 1px solid #5b4d3b;
   background: #17120d;
+  transition: border-color 140ms ease, background-color 140ms ease;
 }
 
 .osrs-selected-main {
@@ -474,6 +489,50 @@ button {
   margin-top: 14px;
   padding-top: 10px;
   border-top: 1px solid #5b4d3b;
+}
+
+.rune-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.rune-choice-grid button {
+  display: grid;
+  gap: 6px;
+  min-height: 124px;
+  padding: 16px;
+  border: 2px solid var(--border-strong);
+  background: #241d16;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    background-color 140ms ease;
+}
+
+.rune-choice-grid button:hover {
+  transform: translateY(-1px);
+}
+
+.rune-choice-grid button.active {
+  border-color: var(--money);
+  background: #263120;
+  box-shadow: inset 0 0 0 1px rgba(121, 212, 111, 0.2);
+}
+
+.choice-title {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.choice-copy {
+  color: var(--muted);
 }
 
 .toggle-inline {
@@ -824,11 +883,19 @@ input[type="number"] {
 
 .question-panel {
   max-width: 860px;
+  padding: 18px 0 16px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .question-copy,
 .question-summary {
   margin-top: 10px;
+  max-width: 700px;
+}
+
+.question-summary strong {
+  color: var(--text);
 }
 
 .batch-choice-grid {
@@ -841,9 +908,14 @@ input[type="number"] {
 .batch-choice-grid button {
   min-height: 92px;
   padding: 12px 14px;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   text-align: left;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
 }
 
 .batch-choice-grid button.active {
@@ -854,6 +926,8 @@ input[type="number"] {
 
 .result-head {
   margin-top: 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
 }
 
 .result-label {
@@ -872,7 +946,7 @@ input[type="number"] {
 
 .result-copy {
   margin-top: 10px;
-  max-width: 760px;
+  max-width: 700px;
   font-size: 16px;
 }
 
@@ -900,12 +974,28 @@ input[type="number"] {
   font-size: 22px;
 }
 
-.edit-inline {
+.result-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   align-items: end;
   margin-top: 18px;
+}
+
+.result-table-section {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.result-table-head h3 {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.result-table-head p {
+  margin-top: 4px;
+  color: var(--muted);
 }
 
 .field-inline {
@@ -920,6 +1010,7 @@ input[type="number"] {
 
 .selected-items-line {
   margin-top: 12px;
+  color: var(--muted);
 }
 
 .error {
@@ -996,6 +1087,7 @@ input[type="number"] {
   overflow-x: auto;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.08);
 }
 
 table {
@@ -1021,18 +1113,36 @@ th {
 }
 
 .combo-cell {
+  display: block;
   min-width: 120px;
-  padding: 4px 0;
+  padding: 8px 4px;
   border: 1px solid transparent;
   cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
 }
 
 .combo-cell.selected {
-  border-color: var(--accent);
+  border-color: var(--money);
+  background: rgba(121, 212, 111, 0.08);
 }
 
 .combo-cell.best {
   background: rgba(213, 181, 125, 0.08);
+}
+
+.combo-cell.selected.best {
+  background:
+    linear-gradient(0deg, rgba(121, 212, 111, 0.08), rgba(121, 212, 111, 0.08)),
+    linear-gradient(0deg, rgba(213, 181, 125, 0.08), rgba(213, 181, 125, 0.08));
+}
+
+.combo-cell.invalid {
+  cursor: default;
+  background: rgba(207, 141, 116, 0.05);
+}
+
+.combo-cell:hover {
+  transform: translateY(-1px);
 }
 
 .combo-price {
@@ -1041,16 +1151,12 @@ th {
   font-weight: 700;
 }
 
-.combo-meta {
-  display: block;
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.35;
-}
-
 .invalid {
   color: var(--danger);
+}
+
+.hidden-summary {
+  display: none;
 }
 
 @keyframes fade-in {
@@ -1096,6 +1202,10 @@ th {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .rune-choice-grid {
+    grid-template-columns: 1fr;
+  }
+
   .detail-item-wide {
     grid-column: span 2;
   }
@@ -1132,6 +1242,10 @@ th {
   .osrs-shop-heading h2,
   .question-panel h2 {
     font-size: 24px;
+  }
+
+  .choice-title {
+    font-size: 21px;
   }
 
   .osrs-shop-tabs {
@@ -1174,5 +1288,15 @@ th {
 
   .osrs-shop-footer {
     margin-top: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
   }
 }

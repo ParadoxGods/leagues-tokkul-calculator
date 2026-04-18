@@ -8,6 +8,14 @@
     maximumFractionDigits: 1,
   });
   const catalog = engine.getTzhaarCatalog();
+  const storesByName = new Map();
+  for (const item of catalog) {
+    if (!storesByName.has(item.storeName)) {
+      storesByName.set(item.storeName, []);
+    }
+    storesByName.get(item.storeName).push(item);
+  }
+  const storeNames = Array.from(storesByName.keys());
   const TRANSITION_MS = 220;
 
   const state = {
@@ -22,46 +30,50 @@
   const cartState = new Map();
   let activeStoreName = "";
   let reportTransitionTimer = 0;
+  let lastRenderedStoreName = "";
 
   const setupView = document.getElementById("setupView");
   const reportView = document.getElementById("reportView");
   const step1View = document.getElementById("step1View");
   const step2View = document.getElementById("step2View");
   const step3View = document.getElementById("step3View");
+  const step4View = document.getElementById("step4View");
   const setupStepText = document.getElementById("setupStepText");
   const wizardStepOneDot = document.getElementById("wizardStepOneDot");
   const wizardStepTwoDot = document.getElementById("wizardStepTwoDot");
   const wizardStepThreeDot = document.getElementById("wizardStepThreeDot");
+  const wizardStepFourDot = document.getElementById("wizardStepFourDot");
   const setupGloves = document.getElementById("setupGloves");
-  const reportGloves = document.getElementById("reportGloves");
-  const reportPresetSelect = document.getElementById("reportPresetSelect");
-  const reportBuyBatchSelect = document.getElementById("reportBuyBatchSelect");
-  const reportSellBatchSelect = document.getElementById("reportSellBatchSelect");
   const toStep2Btn = document.getElementById("toStep2Btn");
   const backToStep1Btn = document.getElementById("backToStep1Btn");
   const toStep3Btn = document.getElementById("toStep3Btn");
   const backToStep2Btn = document.getElementById("backToStep2Btn");
+  const toStep4Btn = document.getElementById("toStep4Btn");
+  const backToStep3Btn = document.getElementById("backToStep3Btn");
   const showReportBtn = document.getElementById("showReportBtn");
   const changeItemsBtn = document.getElementById("changeItemsBtn");
+  const changeSetupBtn = document.getElementById("changeSetupBtn");
   const errorBox = document.getElementById("errorBox");
-  const routeDetails = document.getElementById("routeDetails");
   const comboTable = document.getElementById("comboTable");
   const catalogTabs = document.getElementById("catalogTabs");
   const catalogGroups = document.getElementById("catalogGroups");
   const selectedItemsList = document.getElementById("selectedItemsList");
   const activeStoreTitle = document.getElementById("activeStoreTitle");
   const activeStoreNote = document.getElementById("activeStoreNote");
+  const setupContinueHint = document.getElementById("setupContinueHint");
   const reportLead = document.getElementById("reportLead");
   const reportSub = document.getElementById("reportSub");
   const reportTargetTokkul = document.getElementById("reportTargetTokkul");
   const reportSelectedItems = document.getElementById("reportSelectedItems");
-  const reportRouteHint = document.getElementById("reportRouteHint");
-  const step2RouteNote = document.getElementById("step2RouteNote");
+  const reportRouteName = document.getElementById("reportRouteName");
   const step3RouteNote = document.getElementById("step3RouteNote");
+  const step4RouteNote = document.getElementById("step4RouteNote");
   const step2NeedTokkul = document.getElementById("step2NeedTokkul");
   const step2SelectionCount = document.getElementById("step2SelectionCount");
   const step3NeedTokkul = document.getElementById("step3NeedTokkul");
-  const step3BuyBatch = document.getElementById("step3BuyBatch");
+  const step3RuneLabel = document.getElementById("step3RuneLabel");
+  const step4NeedTokkul = document.getElementById("step4NeedTokkul");
+  const step4BuyBatch = document.getElementById("step4BuyBatch");
 
   const setupCartSelectedItems = document.getElementById("setupCartSelectedItems");
   const setupCartTotalQuantity = document.getElementById("setupCartTotalQuantity");
@@ -81,19 +93,6 @@
   const summaryBuyBatchCost = document.getElementById("summaryBuyBatchCost");
   const summarySellBatchTokkul = document.getElementById("summarySellBatchTokkul");
   const summaryBestCombo = document.getElementById("summaryBestCombo");
-
-  const customFields = document.getElementById("customFields");
-  const customInputs = {
-    itemName: document.getElementById("customItemName"),
-    itemValue: document.getElementById("customItemValue"),
-    sourceStock: document.getElementById("customSourceStock"),
-    sourceSellsAt: document.getElementById("customSourceSellsAt"),
-    sourceDelta: document.getElementById("customSourceDelta"),
-    sourceVirtualInfinite: document.getElementById("customSourceInfinite"),
-    targetStock: document.getElementById("customTargetStock"),
-    targetBuysAt: document.getElementById("customTargetBuysAt"),
-    targetDelta: document.getElementById("customTargetDelta"),
-  };
 
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, (char) => {
@@ -141,20 +140,6 @@
   }
 
   function buildRoute() {
-    if (state.presetId === "custom") {
-      return engine.buildCustomRoute({
-        itemName: customInputs.itemName.value,
-        itemValue: customInputs.itemValue.value,
-        sourceStock: customInputs.sourceStock.value,
-        sourceSellsAt: customInputs.sourceSellsAt.value,
-        sourceDelta: customInputs.sourceDelta.value,
-        sourceVirtualInfinite: customInputs.sourceVirtualInfinite.checked,
-        targetStock: customInputs.targetStock.value,
-        targetBuysAt: customInputs.targetBuysAt.value,
-        targetDelta: customInputs.targetDelta.value,
-      });
-    }
-
     return engine.buildPresetRoute(state.presetId, state.useKaramjaGloves);
   }
 
@@ -192,7 +177,15 @@
     return formatNumber(cart.selectedCount) + " " + label;
   }
 
+  function getRouteItemLabel(route, count) {
+    return route.itemName.toLowerCase() + (count === 1 ? "" : "s");
+  }
+
   function renderSetupBatchChoices() {
+    document.querySelectorAll('[data-role="setup-rune-choice"]').forEach((button) => {
+      button.classList.toggle("active", button.dataset.value === state.presetId);
+    });
+
     document.querySelectorAll('[data-role="setup-buy-batch"]').forEach((button) => {
       button.classList.toggle("active", Number(button.dataset.value) === state.buyBatch);
     });
@@ -203,17 +196,7 @@
   }
 
   function renderCatalog() {
-    const stores = new Map();
-
-    for (const item of catalog) {
-      if (!stores.has(item.storeName)) {
-        stores.set(item.storeName, []);
-      }
-      stores.get(item.storeName).push(item);
-    }
-
-    const storeNames = Array.from(stores.keys());
-    if (!activeStoreName || !stores.has(activeStoreName)) {
+    if (!activeStoreName || !storesByName.has(activeStoreName)) {
       activeStoreName = storeNames[0] || "";
     }
 
@@ -239,9 +222,11 @@
         escapeHtml(shortLabel) +
         "</button>";
     }
-    catalogTabs.innerHTML = tabsHtml;
+    if (catalogTabs.innerHTML !== tabsHtml) {
+      catalogTabs.innerHTML = tabsHtml;
+    }
 
-    const activeItems = stores.get(activeStoreName) || [];
+    const activeItems = storesByName.get(activeStoreName) || [];
     const requiresFireCape = activeItems.some((item) => item.requiresFireCape);
     const note = requiresFireCape
       ? "Fire cape required. Click items from stock to add them to your plan."
@@ -249,6 +234,10 @@
 
     activeStoreTitle.textContent = activeStoreName || "TzHaar shop";
     activeStoreNote.textContent = note;
+
+    if (lastRenderedStoreName === activeStoreName && catalogGroups.children.length) {
+      return;
+    }
 
     let html = '<div class="osrs-stock-slots">';
 
@@ -280,22 +269,25 @@
         escapeHtml(item.name) +
         '">' +
         escapeHtml(item.name) +
-        "</span></span>" +
+        "</span>" +
         "</button>" +
         "</article>";
     }
 
     html += "</div>";
     catalogGroups.innerHTML = html;
+    lastRenderedStoreName = activeStoreName;
   }
 
   function updateCatalogDisplay(cart) {
-    const selectedById = new Map(cart.breakdown.map((item) => [item.id, item]));
+    const activeItems = storesByName.get(activeStoreName) || [];
 
-    for (const item of catalog) {
-      const checkbox = document.querySelector('.catalog-check[data-item-id="' + item.id + '"]');
-      const priceNode = document.querySelector('[data-role="price"][data-item-id="' + item.id + '"]');
-      const row = document.querySelector('[data-item-row="' + item.id + '"]');
+    for (const item of activeItems) {
+      const checkbox = catalogGroups.querySelector('.catalog-check[data-item-id="' + item.id + '"]');
+      const priceNode = catalogGroups.querySelector(
+        '[data-role="price"][data-item-id="' + item.id + '"]'
+      );
+      const row = catalogGroups.querySelector('[data-item-row="' + item.id + '"]');
 
       if (!checkbox || !priceNode || !row) {
         continue;
@@ -312,63 +304,124 @@
     renderSelectedItems(cart);
   }
 
+  function createEmptyPlanNode() {
+    const emptyState = document.createElement("div");
+    emptyState.className = "osrs-empty-plan";
+    emptyState.dataset.emptyState = "true";
+    emptyState.innerHTML =
+      "<strong>No items selected</strong><span>Pick items from the shop stock on the left.</span>";
+    return emptyState;
+  }
+
+  function createSelectedItemNode(item) {
+    const node = document.createElement("article");
+    node.className = "osrs-selected-item";
+    node.dataset.itemId = item.id;
+    node.innerHTML =
+      '<div class="osrs-selected-main">' +
+      '<span class="osrs-selected-sprite-wrap">' +
+      '<img class="osrs-selected-sprite" loading="lazy" alt="" />' +
+      "</span>" +
+      '<div class="osrs-selected-copy">' +
+      '<strong data-field="name"></strong>' +
+      '<span data-field="subtotal"></span>' +
+      "</div>" +
+      "</div>" +
+      '<div class="osrs-selected-controls">' +
+      '<button class="shop-qty-btn" type="button" data-role="decrement-item">&#8722;</button>' +
+      '<input class="selected-item-qty" type="number" min="1" step="1" />' +
+      '<button class="shop-qty-btn" type="button" data-role="increment-item">+</button>' +
+      '<button class="osrs-remove-btn" type="button" data-role="remove-item">X</button>' +
+      "</div>";
+    updateSelectedItemNode(node, item);
+    return node;
+  }
+
+  function updateSelectedItemNode(node, item) {
+    const sprite = node.querySelector(".osrs-selected-sprite");
+    const name = node.querySelector('[data-field="name"]');
+    const subtotal = node.querySelector('[data-field="subtotal"]');
+    const qtyInput = node.querySelector(".selected-item-qty");
+    const decrementButton = node.querySelector('[data-role="decrement-item"]');
+    const incrementButton = node.querySelector('[data-role="increment-item"]');
+    const removeButton = node.querySelector('[data-role="remove-item"]');
+
+    node.dataset.itemId = item.id;
+    if (item.spriteUrl) {
+      sprite.src = item.spriteUrl;
+    } else {
+      sprite.removeAttribute("src");
+    }
+    sprite.alt = item.name;
+    name.textContent = item.name;
+    subtotal.textContent = formatNumber(item.subtotal, "Tokkul");
+    qtyInput.value = item.quantity;
+    qtyInput.dataset.itemId = item.id;
+    qtyInput.setAttribute("aria-label", "Quantity for " + item.name);
+    decrementButton.dataset.itemId = item.id;
+    decrementButton.setAttribute("aria-label", "Decrease quantity for " + item.name);
+    decrementButton.title = "Decrease quantity";
+    incrementButton.dataset.itemId = item.id;
+    incrementButton.setAttribute("aria-label", "Increase quantity for " + item.name);
+    incrementButton.title = "Increase quantity";
+    removeButton.dataset.itemId = item.id;
+    removeButton.setAttribute("aria-label", "Remove " + item.name);
+    removeButton.title = "Remove item";
+  }
+
   function renderSelectedItems(cart) {
     if (!cart.breakdown.length) {
-      selectedItemsList.innerHTML =
-        '<div class="osrs-empty-plan">' +
-        "<strong>No items selected</strong>" +
-        "<span>Pick items from the shop stock on the left.</span>" +
-        "</div>";
+      const emptyState = selectedItemsList.firstElementChild;
+      if (
+        selectedItemsList.childElementCount === 1 &&
+        emptyState &&
+        emptyState.dataset.emptyState === "true"
+      ) {
+        return;
+      }
+
+      selectedItemsList.replaceChildren(createEmptyPlanNode());
       return;
     }
 
-    let html = "";
-    for (const item of cart.breakdown) {
-      html +=
-        '<article class="osrs-selected-item">' +
-        '<div class="osrs-selected-main">' +
-        '<span class="osrs-selected-sprite-wrap">' +
-        '<img class="osrs-selected-sprite" loading="lazy" src="' +
-        escapeHtml(item.spriteUrl) +
-        '" alt="' +
-        escapeHtml(item.name) +
-        '" />' +
-        "</span>" +
-        '<div class="osrs-selected-copy">' +
-        "<strong>" +
-        escapeHtml(item.name) +
-        "</strong>" +
-        "<span>" +
-        formatNumber(item.subtotal, "Tokkul") +
-        "</span>" +
-        "</div>" +
-        "</div>" +
-        '<div class="osrs-selected-controls">' +
-        '<button class="shop-qty-btn" type="button" aria-label="Decrease quantity for ' +
-        escapeHtml(item.name) +
-        '" title="Decrease quantity" data-role="decrement-item" data-item-id="' +
-        item.id +
-        '">&#8722;</button>' +
-        '<input class="selected-item-qty" type="number" min="1" step="1" value="' +
-        item.quantity +
-        '" data-item-id="' +
-        item.id +
-        '" />' +
-        '<button class="shop-qty-btn" type="button" aria-label="Increase quantity for ' +
-        escapeHtml(item.name) +
-        '" title="Increase quantity" data-role="increment-item" data-item-id="' +
-        item.id +
-        '">+</button>' +
-        '<button class="osrs-remove-btn" type="button" aria-label="Remove ' +
-        escapeHtml(item.name) +
-        '" title="Remove item" data-role="remove-item" data-item-id="' +
-        item.id +
-        '">X</button>' +
-        "</div>" +
-        "</article>";
+    if (
+      selectedItemsList.childElementCount === 1 &&
+      selectedItemsList.firstElementChild &&
+      selectedItemsList.firstElementChild.dataset.emptyState === "true"
+    ) {
+      selectedItemsList.replaceChildren();
     }
 
-    selectedItemsList.innerHTML = html;
+    const existingNodes = new Map();
+    Array.from(selectedItemsList.children).forEach((node) => {
+      if (node.dataset.itemId) {
+        existingNodes.set(node.dataset.itemId, node);
+      }
+    });
+
+    let previousNode = null;
+
+    for (const item of cart.breakdown) {
+      let node = existingNodes.get(item.id);
+      if (!node) {
+        node = createSelectedItemNode(item);
+      } else {
+        updateSelectedItemNode(node, item);
+      }
+
+      if (!previousNode) {
+        if (selectedItemsList.firstElementChild !== node) {
+          selectedItemsList.insertBefore(node, selectedItemsList.firstElementChild);
+        }
+      } else if (previousNode.nextElementSibling !== node) {
+        selectedItemsList.insertBefore(node, previousNode.nextElementSibling);
+      }
+
+      previousNode = node;
+      existingNodes.delete(item.id);
+    }
+
+    existingNodes.forEach((node) => node.remove());
   }
 
   function renderSetup(cart, route) {
@@ -380,49 +433,48 @@
     step1View.classList.toggle("hidden", state.step !== 1);
     step2View.classList.toggle("hidden", state.step !== 2);
     step3View.classList.toggle("hidden", state.step !== 3);
-    setupStepText.textContent = "Step " + state.step + " of 3";
+    step4View.classList.toggle("hidden", state.step !== 4);
+    setupStepText.textContent = "Step " + state.step + " of 4";
     wizardStepOneDot.classList.toggle("active", state.step >= 1);
     wizardStepTwoDot.classList.toggle("active", state.step >= 2);
     wizardStepThreeDot.classList.toggle("active", state.step >= 3);
+    wizardStepFourDot.classList.toggle("active", state.step >= 4);
     setupGloves.checked = state.useKaramjaGloves;
 
     setupCartSelectedItems.textContent = formatNumber(cart.selectedCount);
     setupCartTotalQuantity.textContent = formatNumber(cart.totalQuantity);
     setupCartTokkulTotal.textContent = formatNumber(cart.totalTokkul, "Tokkul");
+    setupContinueHint.textContent =
+      cart.totalTokkul > 0
+        ? describeSelectionCount(cart) + " ready for " + formatNumber(cart.totalTokkul, "Tokkul") + "."
+        : "Select at least one item to continue.";
     toStep2Btn.disabled = cart.totalTokkul <= 0;
     toStep3Btn.disabled = cart.totalTokkul <= 0;
+    toStep4Btn.disabled = cart.totalTokkul <= 0;
     showReportBtn.disabled = cart.totalTokkul <= 0;
 
     step2NeedTokkul.textContent = formatNumber(cart.totalTokkul, "Tokkul");
     step2SelectionCount.textContent = describeSelectionCount(cart);
     step3NeedTokkul.textContent = formatNumber(cart.totalTokkul, "Tokkul");
-    step3BuyBatch.textContent = formatNumber(state.buyBatch);
+    step3RuneLabel.textContent = route.itemName;
+    step4NeedTokkul.textContent = formatNumber(cart.totalTokkul, "Tokkul");
+    step4BuyBatch.textContent = formatNumber(state.buyBatch);
 
-    const routeMessage = "Route: " + route.label + ". You can change this later from the result.";
-    step2RouteNote.textContent = routeMessage;
+    const routeMessage = "Current route: " + route.itemName + " via standard rune shop.";
     step3RouteNote.textContent = routeMessage;
-  }
-
-  function renderReportControls() {
-    reportGloves.checked = state.useKaramjaGloves;
-    reportPresetSelect.value = state.presetId;
-    reportBuyBatchSelect.value = String(state.buyBatch);
-    reportSellBatchSelect.value = String(state.sellBatch);
-    reportRouteHint.classList.toggle("hidden", state.presetId !== "custom");
-    customFields.classList.toggle("hidden", state.presetId !== "custom");
+    step4RouteNote.textContent = routeMessage;
   }
 
   function renderSummary(route, cart, selectedStrategy, bestStrategy) {
-    const itemLabel =
-      route.itemName.toLowerCase() + (selectedStrategy && selectedStrategy.itemsBought === 1 ? "" : "s");
     summaryBuyLabel.textContent = route.itemName + " to buy";
     summarySellLabel.textContent = route.itemName + " to sell";
     reportTargetTokkul.textContent = formatNumber(cart.totalTokkul, "Tokkul");
     reportSelectedItems.textContent = "Items: " + summarizeSelections(cart);
+    reportRouteName.textContent = route.itemName;
 
     if (!selectedStrategy || !selectedStrategy.valid) {
       reportLead.textContent = "No valid result";
-      reportSub.textContent = "Adjust the route or batch sizes and try again.";
+      reportSub.textContent = "This buy and sell pair does not work. Pick another cell in the table below.";
       summaryGp.textContent = "-";
       summaryTokkul.textContent = "-";
       summaryGpPerTokkul.textContent = "-";
@@ -440,23 +492,23 @@
       return;
     }
 
-    reportLead.textContent = "Need " + formatNumber(selectedStrategy.gpSpent, "gp");
+    reportLead.textContent = "Need " + formatNumber(selectedStrategy.gpSpent, "GP");
     reportSub.textContent =
-      "Buy " +
+      "Use " +
+      getRouteItemLabel(route, selectedStrategy.itemsBought) +
+      ". Buy " +
       formatNumber(selectedStrategy.itemsBought) +
-      " " +
-      itemLabel +
-      ", then sell " +
+      " total, sell " +
       formatNumber(selectedStrategy.itemsSold) +
-      ". Use buy " +
-      selectedStrategy.buyBatch +
-      " and sell " +
-      selectedStrategy.sellBatch +
-      " to reach " +
+      " total, and reach " +
       formatNumber(selectedStrategy.tokkulReached, "Tokkul") +
+      " with buy " +
+      selectedStrategy.buyBatch +
+      " / sell " +
+      selectedStrategy.sellBatch +
       ".";
 
-    summaryGp.textContent = formatNumber(selectedStrategy.gpSpent, "gp");
+    summaryGp.textContent = formatNumber(selectedStrategy.gpSpent, "GP");
     summaryTokkul.textContent = formatNumber(selectedStrategy.tokkulReached, "Tokkul");
     summaryGpPerTokkul.textContent = selectedStrategy.gpPerTokkul.toFixed(3) + " gp";
     summaryItemsSold.textContent = formatNumber(selectedStrategy.itemsSold);
@@ -473,59 +525,9 @@
         " / Sell " +
         bestStrategy.sellBatch +
         " (" +
-        formatNumber(bestStrategy.gpSpent, "gp") +
+        formatNumber(bestStrategy.gpSpent, "GP") +
         ")"
       : "-";
-  }
-
-  function renderRouteDetails(route, cart, selectedStrategy) {
-    const info = engine.describeRoute(route);
-    const selectedLine =
-      cart.breakdown.length > 0
-        ? "<p><strong>Selected items:</strong> " +
-          cart.breakdown
-            .map((item) => escapeHtml(item.name) + " x" + item.quantity)
-            .join(", ") +
-          "</p>"
-        : "";
-    const strategyLine =
-      selectedStrategy && selectedStrategy.valid
-        ? "<p><strong>Chosen batches:</strong> buy " +
-          selectedStrategy.buyBatch +
-          " at a time, sell " +
-          selectedStrategy.sellBatch +
-          " at a time.</p>"
-        : "";
-
-    routeDetails.innerHTML =
-      "<p><strong>Route item:</strong> " +
-      escapeHtml(info.itemName) +
-      " (value " +
-      formatNumber(info.itemValue) +
-      ")</p>" +
-      "<p><strong>Tokkul target:</strong> " +
-      formatNumber(cart.totalTokkul, "Tokkul") +
-      "</p>" +
-      selectedLine +
-      strategyLine +
-      "<p><strong>Source shop:</strong> " +
-      escapeHtml(info.sourceShopName) +
-      " | sells at " +
-      info.sourceSellsAtPercent.toFixed(1) +
-      "% | change per missing " +
-      info.sourceDeltaPercent.toFixed(1) +
-      "%</p>" +
-      "<p><strong>Target shop:</strong> " +
-      escapeHtml(info.targetShopName) +
-      " | buys at " +
-      info.targetBuysAtPercent.toFixed(1) +
-      "% | change per stock swing " +
-      info.targetDeltaPercent.toFixed(1) +
-      "%</p>" +
-      "<p><strong>Karamja gloves:</strong> " +
-      (info.useKaramjaGloves ? "Enabled" : "Disabled") +
-      "</p>" +
-      "<p><strong>Assumption:</strong> every buy click and every sell click starts from default stock again.</p>";
   }
 
   function renderComboTable(route, targetTokkul) {
@@ -536,12 +538,12 @@
 
     let html = "<thead><tr><th>Buy \\ Sell</th>";
     for (const sellBatch of engine.BATCH_SIZES) {
-      html += "<th>" + sellBatch + "</th>";
+      html += "<th>Sell " + sellBatch + "</th>";
     }
     html += "</tr></thead><tbody>";
 
     for (const buyBatch of engine.BATCH_SIZES) {
-      html += "<tr><th>" + buyBatch + "</th>";
+      html += "<tr><th>Buy " + buyBatch + "</th>";
 
       for (const sellBatch of engine.BATCH_SIZES) {
         const strategy = strategies.find(
@@ -555,9 +557,7 @@
             buyBatch +
             '" data-sell="' +
             sellBatch +
-            '"><span class="combo-price">Invalid</span><span class="combo-meta">' +
-            escapeHtml(strategy ? strategy.reason : "Unavailable") +
-            "</span></div></td>";
+            '"><span class="combo-price">N/A</span></div></td>';
           continue;
         }
 
@@ -578,15 +578,8 @@
           sellBatch +
           '">' +
           '<span class="combo-price">' +
-          formatNumber(strategy.gpSpent) +
-          " gp</span>" +
-          '<span class="combo-meta">' +
-          formatNumber(strategy.tokkulReached) +
-          " Tokkul<br>" +
-          formatNumber(strategy.itemsBought) +
-          " items<br>" +
-          strategy.gpPerTokkul.toFixed(3) +
-          " gp ea</span></div></td>";
+          formatNumber(strategy.gpSpent, "GP") +
+          "</span></div></td>";
       }
 
       html += "</tr>";
@@ -606,7 +599,6 @@
     renderSetup(cart, route);
     renderSetupBatchChoices();
     reportView.classList.toggle("hidden", !state.reportVisible);
-    renderReportControls();
 
     if (!state.reportVisible) {
       return;
@@ -615,7 +607,6 @@
     if (cart.totalTokkul <= 0) {
       setError("Pick at least one TzHaar item to build the report.");
       renderSummary(route, cart, null, null);
-      routeDetails.innerHTML = "";
       comboTable.innerHTML = "";
       return;
     }
@@ -628,7 +619,6 @@
     );
     const bestStrategy = renderComboTable(route, cart.totalTokkul);
     renderSummary(route, cart, selectedStrategy, bestStrategy);
-    renderRouteDetails(route, cart, selectedStrategy);
 
     if (!selectedStrategy.valid) {
       setError(selectedStrategy.reason || "No valid strategy.");
@@ -666,32 +656,14 @@
       render();
     });
 
-    reportGloves.addEventListener("change", () => {
-      state.useKaramjaGloves = reportGloves.checked;
-      render();
-    });
-
-    reportPresetSelect.addEventListener("change", () => {
-      state.presetId = reportPresetSelect.value;
-      render();
-    });
-
-    reportBuyBatchSelect.addEventListener("change", () => {
-      state.buyBatch = Number(reportBuyBatchSelect.value);
-      render();
-    });
-
-    reportSellBatchSelect.addEventListener("change", () => {
-      state.sellBatch = Number(reportSellBatchSelect.value);
-      render();
-    });
-
-    Object.values(customInputs).forEach((element) => {
-      element.addEventListener("input", render);
-      element.addEventListener("change", render);
-    });
-
     document.addEventListener("click", (event) => {
+      const runeChoice = event.target.closest('[data-role="setup-rune-choice"]');
+      if (runeChoice) {
+        state.presetId = runeChoice.dataset.value;
+        render();
+        return;
+      }
+
       const buyButton = event.target.closest('[data-role="setup-buy-batch"]');
       if (buyButton) {
         state.buyBatch = Number(buyButton.dataset.value);
@@ -734,6 +706,18 @@
       scrollToTop();
     });
 
+    toStep4Btn.addEventListener("click", () => {
+      state.step = 4;
+      render();
+      scrollToTop();
+    });
+
+    backToStep3Btn.addEventListener("click", () => {
+      state.step = 3;
+      render();
+      scrollToTop();
+    });
+
     showReportBtn.addEventListener("click", startReportTransition);
 
     changeItemsBtn.addEventListener("click", () => {
@@ -748,6 +732,18 @@
       scrollToTop();
     });
 
+    changeSetupBtn.addEventListener("click", () => {
+      if (reportTransitionTimer) {
+        window.clearTimeout(reportTransitionTimer);
+        reportTransitionTimer = 0;
+      }
+      state.reportVisible = false;
+      state.step = 2;
+      setupView.classList.remove("is-transitioning-out");
+      render();
+      scrollToTop();
+    });
+
     catalogTabs.addEventListener("click", (event) => {
       const tab = event.target.closest(".catalog-tab");
       if (!tab) {
@@ -755,6 +751,7 @@
       }
 
       activeStoreName = tab.dataset.storeName;
+      lastRenderedStoreName = "";
       render();
     });
 
