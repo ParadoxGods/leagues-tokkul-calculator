@@ -14,291 +14,264 @@
     <main class="app-shell">
       <header class="app-header">
         <h1>Leagues Tokkul Calculator</h1>
-        <p>Pick the items you want, answer two batch questions, then get a clean rune cost report.</p>
+        <p>Pick the TzHaar items you want, choose buy and sell batch sizes, and get the rune cost fast.</p>
       </header>
 
       <section id="setupView" class="view setup-view">
-        <div class="wizard-shell">
-          <div class="wizard-progress">
-            <span id="setupStepText" class="wizard-step-text">Step 1 of 3</span>
-            <div class="wizard-track">
-              <span id="wizardStepOneDot" class="wizard-dot active"></span>
-              <span id="wizardStepTwoDot" class="wizard-dot"></span>
-              <span id="wizardStepThreeDot" class="wizard-dot"></span>
+        <div class="progress-line">
+          <span id="setupStepText" class="progress-step">Step 1 of 3</span>
+          <div class="progress-dots">
+            <span id="wizardStepOneDot" class="progress-dot active"></span>
+            <span id="wizardStepTwoDot" class="progress-dot"></span>
+            <span id="wizardStepThreeDot" class="progress-dot"></span>
+          </div>
+        </div>
+
+        <section id="step1View" class="step-view">
+          <div class="setup-topline">
+            <div>
+              <h2>Pick the items you want</h2>
+              <p>Selected items set the Tokkul target automatically.</p>
+            </div>
+            <label class="toggle-inline">
+              <input id="setupGloves" type="checkbox" checked />
+              <span>Karamja gloves prices</span>
+            </label>
+          </div>
+
+          <div class="selection-status">
+            <span><strong id="setupCartTokkulTotal">0 Tokkul</strong> needed</span>
+            <span><strong id="setupCartSelectedItems">0</strong> items</span>
+            <span><strong id="setupCartTotalQuantity">0</strong> total copies</span>
+          </div>
+
+          <div id="catalogTabs" class="catalog-tabs"></div>
+          <div class="catalog-scroll">
+            <div id="catalogGroups" class="catalog-groups"></div>
+          </div>
+
+          <div class="footer-bar">
+            <p class="helper-copy">Select at least one item to continue.</p>
+            <button id="toStep2Btn" class="action-btn primary" type="button">Continue</button>
+          </div>
+        </section>
+
+        <section id="step2View" class="step-view hidden">
+          <div class="question-panel">
+            <span class="question-step">Step 2</span>
+            <h2>How many runes do you want to buy at one time?</h2>
+            <p id="step2RouteNote" class="question-copy">
+              Current route: Death rune via standard rune shop. You can change this later.
+            </p>
+            <p class="question-summary">
+              Need <strong id="step2NeedTokkul">0 Tokkul</strong> from
+              <strong id="step2SelectionCount">0 selected items</strong>.
+            </p>
+
+            <div id="setupBuyBatchChoices" class="batch-choice-grid">
+              <button type="button" data-role="setup-buy-batch" data-value="1">Buy 1</button>
+              <button type="button" data-role="setup-buy-batch" data-value="5">Buy 5</button>
+              <button type="button" data-role="setup-buy-batch" data-value="10">Buy 10</button>
+              <button type="button" data-role="setup-buy-batch" data-value="50">Buy 50</button>
             </div>
           </div>
 
-          <section id="step1View" class="wizard-step">
-            <div class="section-head">
-              <div>
-                <h2 class="section-title">1. Pick The TzHaar Items You Want</h2>
-                <p class="section-copy">This builds your Tokkul target automatically.</p>
-              </div>
-              <label class="toggle simple-toggle">
-                <input id="setupGloves" type="checkbox" checked />
-                <span>Use Karamja gloves prices</span>
-              </label>
+          <div class="footer-bar">
+            <button id="backToStep1Btn" class="action-btn secondary" type="button">Back</button>
+            <button id="toStep3Btn" class="action-btn primary" type="button">Continue</button>
+          </div>
+        </section>
+
+        <section id="step3View" class="step-view hidden">
+          <div class="question-panel">
+            <span class="question-step">Step 3</span>
+            <h2>How many runes do you want to sell at one time?</h2>
+            <p id="step3RouteNote" class="question-copy">
+              Current route: Death rune via standard rune shop. You can change this later.
+            </p>
+            <p class="question-summary">
+              Need <strong id="step3NeedTokkul">0 Tokkul</strong>. Buying in batches of
+              <strong id="step3BuyBatch">50</strong>.
+            </p>
+
+            <div id="setupSellBatchChoices" class="batch-choice-grid">
+              <button type="button" data-role="setup-sell-batch" data-value="1">Sell 1</button>
+              <button type="button" data-role="setup-sell-batch" data-value="5">Sell 5</button>
+              <button type="button" data-role="setup-sell-batch" data-value="10">Sell 10</button>
+              <button type="button" data-role="setup-sell-batch" data-value="50">Sell 50</button>
             </div>
+          </div>
 
-            <div class="cart-summary">
-              <div class="mini-card">
-                <span>Selected items</span>
-                <strong id="setupCartSelectedItems">0</strong>
-              </div>
-              <div class="mini-card">
-                <span>Total copies</span>
-                <strong id="setupCartTotalQuantity">0</strong>
-              </div>
-              <div class="mini-card">
-                <span>Tokkul needed</span>
-                <strong id="setupCartTokkulTotal">0 Tokkul</strong>
-              </div>
-            </div>
-
-            <div id="catalogTabs" class="catalog-tabs"></div>
-            <div class="catalog-scroll">
-              <div id="catalogGroups" class="catalog-groups"></div>
-            </div>
-
-            <div class="action-row">
-              <p class="helper-copy">Choose at least one item to continue.</p>
-              <button id="toStep2Btn" class="action-btn primary" type="button">Continue</button>
-            </div>
-          </section>
-
-          <section id="step2View" class="wizard-step hidden">
-            <div class="question-shell">
-              <p class="question-kicker">Question 1 of 2</p>
-              <h2 class="question-title">How many runes do you want to buy at one time?</h2>
-              <p id="step2RouteNote" class="question-copy">
-                Current route: Death rune via standard rune shop. You can change this later from the report.
-              </p>
-              <p class="question-recap">
-                Need <strong id="step2NeedTokkul">0 Tokkul</strong> for
-                <strong id="step2SelectionCount">0 selected items</strong>.
-              </p>
-
-              <div id="setupBuyBatchChoices" class="wizard-choice-grid">
-                <button type="button" data-role="setup-buy-batch" data-value="1">Buy 1</button>
-                <button type="button" data-role="setup-buy-batch" data-value="5">Buy 5</button>
-                <button type="button" data-role="setup-buy-batch" data-value="10">Buy 10</button>
-                <button type="button" data-role="setup-buy-batch" data-value="50">Buy 50</button>
-              </div>
-            </div>
-
-            <div class="action-row">
-              <button id="backToStep1Btn" class="action-btn secondary" type="button">Back</button>
-              <button id="toStep3Btn" class="action-btn primary" type="button">Continue</button>
-            </div>
-          </section>
-
-          <section id="step3View" class="wizard-step hidden">
-            <div class="question-shell">
-              <p class="question-kicker">Question 2 of 2</p>
-              <h2 class="question-title">How many runes do you want to sell at one time?</h2>
-              <p id="step3RouteNote" class="question-copy">
-                Current route: Death rune via standard rune shop. You can change this later from the report.
-              </p>
-              <p class="question-recap">
-                Need <strong id="step3NeedTokkul">0 Tokkul</strong>. Buying in batches of
-                <strong id="step3BuyBatch">50</strong>.
-              </p>
-
-              <div id="setupSellBatchChoices" class="wizard-choice-grid">
-                <button type="button" data-role="setup-sell-batch" data-value="1">Sell 1</button>
-                <button type="button" data-role="setup-sell-batch" data-value="5">Sell 5</button>
-                <button type="button" data-role="setup-sell-batch" data-value="10">Sell 10</button>
-                <button type="button" data-role="setup-sell-batch" data-value="50">Sell 50</button>
-              </div>
-            </div>
-
-            <div class="action-row">
-              <button id="backToStep2Btn" class="action-btn secondary" type="button">Back</button>
-              <button id="showReportBtn" class="action-btn primary" type="button">Show Report</button>
-            </div>
-          </section>
-        </div>
+          <div class="footer-bar">
+            <button id="backToStep2Btn" class="action-btn secondary" type="button">Back</button>
+            <button id="showReportBtn" class="action-btn primary" type="button">Show Report</button>
+          </div>
+        </section>
       </section>
 
       <section id="reportView" class="view report-view hidden">
-        <div class="report-hero">
-          <p id="reportLead" class="report-lead">Choose your setup to see the report.</p>
-          <p id="reportSub" class="report-sub">
-            The report will show how many runes to buy, how much GP you need, and how much Tokkul you reach.
+        <div class="result-head">
+          <p class="result-label">Result</p>
+          <h2 id="reportLead" class="result-amount">Need 0 gp</h2>
+          <p id="reportSub" class="result-copy">
+            Choose your items and batch sizes to see how many runes to buy and sell.
           </p>
         </div>
 
-        <div class="report-target-bar">
-          <div class="target-chip">
-            <span>Tokkul needed</span>
-            <strong id="reportTargetTokkul">0</strong>
+        <div class="result-strip">
+          <div class="strip-item">
+            <span>Tokkul target</span>
+            <strong id="reportTargetTokkul">0 Tokkul</strong>
           </div>
-          <div class="target-chip">
-            <span>Selected items</span>
-            <strong id="reportSelectedItems">None</strong>
-          </div>
-        </div>
-
-        <div class="report-controls">
-          <div class="report-controls-head">
-            <h2 class="section-title">Edit Report</h2>
-            <div class="report-actions">
-              <button id="changeItemsBtn" class="action-btn secondary" type="button">Edit Wanted Items</button>
-            </div>
-          </div>
-
-          <div class="quick-edit-grid">
-            <label class="toggle simple-toggle">
-              <input id="reportGloves" type="checkbox" checked />
-              <span>Use Karamja gloves prices</span>
-            </label>
-
-            <label class="field">
-              <span>Rune Route</span>
-              <select id="reportPresetSelect">
-                <option value="chaos-standard">Chaos rune via standard rune shop</option>
-                <option value="death-standard">Death rune via standard rune shop</option>
-                <option value="custom">Custom route</option>
-              </select>
-            </label>
-
-            <label class="field">
-              <span>Buy at one time</span>
-              <select id="reportBuyBatchSelect">
-                <option value="1">1</option>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="50">50</option>
-              </select>
-            </label>
-
-            <label class="field">
-              <span>Sell at one time</span>
-              <select id="reportSellBatchSelect">
-                <option value="1">1</option>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="50">50</option>
-              </select>
-            </label>
-          </div>
-
-          <p id="reportRouteHint" class="helper-copy hidden">Custom route values update the report live.</p>
-
-          <div id="customFields" class="custom-grid hidden">
-            <h3>Custom Route Values</h3>
-
-            <label class="field">
-              <span>Item name</span>
-              <input id="customItemName" type="text" value="Chaos rune" />
-            </label>
-
-            <label class="field">
-              <span>Item value</span>
-              <input id="customItemValue" type="number" min="1" step="1" value="90" />
-            </label>
-
-            <label class="field">
-              <span>Source shop stock</span>
-              <input id="customSourceStock" type="number" min="1" step="1" value="250" />
-            </label>
-
-            <label class="field">
-              <span>Source sells at %</span>
-              <input id="customSourceSellsAt" type="number" min="0" step="0.1" value="100" />
-            </label>
-
-            <label class="field">
-              <span>Source change per missing %</span>
-              <input id="customSourceDelta" type="number" min="0" step="0.1" value="0.1" />
-            </label>
-
-            <label class="toggle simple-toggle">
-              <input id="customSourceInfinite" type="checkbox" />
-              <span>Treat source as hidden-base infinite stock</span>
-            </label>
-
-            <label class="field">
-              <span>Target shop stock</span>
-              <input id="customTargetStock" type="number" min="1" step="1" value="2500" />
-            </label>
-
-            <label class="field">
-              <span>Target buys at %</span>
-              <input id="customTargetBuysAt" type="number" min="0" step="0.1" value="35" />
-            </label>
-
-            <label class="field">
-              <span>Target change per stock %</span>
-              <input id="customTargetDelta" type="number" min="0" step="0.1" value="2" />
-            </label>
-          </div>
-        </div>
-
-        <div id="errorBox" class="error hidden"></div>
-
-        <div class="summary-grid">
-          <div class="summary-card main-card">
-            <span>GP needed</span>
-            <strong id="summaryGp">0</strong>
-          </div>
-          <div class="summary-card">
+          <div class="strip-item">
             <span id="summaryBuyLabel">Runes to buy</span>
             <strong id="summaryItemsBought">0</strong>
           </div>
-          <div class="summary-card">
+          <div class="strip-item">
             <span id="summarySellLabel">Runes to sell</span>
             <strong id="summaryItemsSold">0</strong>
           </div>
-          <div class="summary-card">
+          <div class="strip-item">
             <span>Tokkul reached</span>
-            <strong id="summaryTokkul">0</strong>
+            <strong id="summaryTokkul">0 Tokkul</strong>
           </div>
         </div>
 
-        <div class="detail-grid">
-          <div class="summary-card">
-            <span>GP per Tokkul</span>
-            <strong id="summaryGpPerTokkul">0</strong>
-          </div>
-          <div class="summary-card">
-            <span>Buy batch cost</span>
-            <strong id="summaryBuyBatchCost">0 gp</strong>
-          </div>
-          <div class="summary-card">
-            <span>Sell batch yield</span>
-            <strong id="summarySellBatchTokkul">0 Tokkul</strong>
-          </div>
-          <div class="summary-card">
-            <span>Best combo</span>
-            <strong id="summaryBestCombo">-</strong>
-          </div>
-          <div class="summary-card">
-            <span>Buy actions</span>
-            <strong id="summaryBuyBatches">0</strong>
-          </div>
-          <div class="summary-card">
-            <span>Sell actions</span>
-            <strong id="summarySellBatches">0</strong>
-          </div>
-          <div class="summary-card">
-            <span>Leftover items</span>
-            <strong id="summaryLeftover">0</strong>
-          </div>
-          <div class="summary-card">
-            <span>Overshoot Tokkul</span>
-            <strong id="summaryOvershoot">0</strong>
-          </div>
+        <div class="edit-inline">
+          <button id="changeItemsBtn" class="action-btn secondary" type="button">Edit Items</button>
+
+          <label class="field-inline">
+            <span>Route</span>
+            <select id="reportPresetSelect">
+              <option value="chaos-standard">Chaos rune</option>
+              <option value="death-standard">Death rune</option>
+              <option value="custom">Custom route</option>
+            </select>
+          </label>
+
+          <label class="field-inline">
+            <span>Buy</span>
+            <select id="reportBuyBatchSelect">
+              <option value="1">1</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="50">50</option>
+            </select>
+          </label>
+
+          <label class="field-inline">
+            <span>Sell</span>
+            <select id="reportSellBatchSelect">
+              <option value="1">1</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="50">50</option>
+            </select>
+          </label>
+
+          <label class="toggle-inline">
+            <input id="reportGloves" type="checkbox" checked />
+            <span>Karamja gloves prices</span>
+          </label>
         </div>
 
-        <details class="advanced-panel">
-          <summary>Route Details</summary>
-          <div id="routeDetails" class="route-copy advanced-body"></div>
+        <p id="reportSelectedItems" class="selected-items-line">Items: None</p>
+        <div id="errorBox" class="error hidden"></div>
+        <p id="reportRouteHint" class="helper-copy hidden">Using custom route values below.</p>
+
+        <div id="customFields" class="custom-grid hidden">
+          <label class="field-inline">
+            <span>Item name</span>
+            <input id="customItemName" type="text" value="Chaos rune" />
+          </label>
+
+          <label class="field-inline">
+            <span>Item value</span>
+            <input id="customItemValue" type="number" min="1" step="1" value="90" />
+          </label>
+
+          <label class="field-inline">
+            <span>Source stock</span>
+            <input id="customSourceStock" type="number" min="1" step="1" value="250" />
+          </label>
+
+          <label class="field-inline">
+            <span>Source sells at %</span>
+            <input id="customSourceSellsAt" type="number" min="0" step="0.1" value="100" />
+          </label>
+
+          <label class="field-inline">
+            <span>Source delta %</span>
+            <input id="customSourceDelta" type="number" min="0" step="0.1" value="0.1" />
+          </label>
+
+          <label class="toggle-inline toggle-inline-full">
+            <input id="customSourceInfinite" type="checkbox" />
+            <span>Hidden-base infinite stock</span>
+          </label>
+
+          <label class="field-inline">
+            <span>Target stock</span>
+            <input id="customTargetStock" type="number" min="1" step="1" value="2500" />
+          </label>
+
+          <label class="field-inline">
+            <span>Target buys at %</span>
+            <input id="customTargetBuysAt" type="number" min="0" step="0.1" value="35" />
+          </label>
+
+          <label class="field-inline">
+            <span>Target delta %</span>
+            <input id="customTargetDelta" type="number" min="0" step="0.1" value="2" />
+          </label>
+        </div>
+
+        <details class="simple-details">
+          <summary>More details</summary>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span>GP needed</span>
+              <strong id="summaryGp">0 gp</strong>
+            </div>
+            <div class="detail-item">
+              <span>GP per Tokkul</span>
+              <strong id="summaryGpPerTokkul">0</strong>
+            </div>
+            <div class="detail-item">
+              <span>Buy batch cost</span>
+              <strong id="summaryBuyBatchCost">0 gp</strong>
+            </div>
+            <div class="detail-item">
+              <span>Sell batch yield</span>
+              <strong id="summarySellBatchTokkul">0 Tokkul</strong>
+            </div>
+            <div class="detail-item">
+              <span>Buy actions</span>
+              <strong id="summaryBuyBatches">0</strong>
+            </div>
+            <div class="detail-item">
+              <span>Sell actions</span>
+              <strong id="summarySellBatches">0</strong>
+            </div>
+            <div class="detail-item">
+              <span>Leftover items</span>
+              <strong id="summaryLeftover">0</strong>
+            </div>
+            <div class="detail-item">
+              <span>Overshoot Tokkul</span>
+              <strong id="summaryOvershoot">0</strong>
+            </div>
+            <div class="detail-item detail-item-wide">
+              <span>Best combo</span>
+              <strong id="summaryBestCombo">-</strong>
+            </div>
+          </div>
+          <div id="routeDetails" class="route-copy"></div>
         </details>
 
-        <details class="advanced-panel">
-          <summary>All 16 Batch Combinations</summary>
-          <div class="table-wrap advanced-body">
+        <details class="simple-details">
+          <summary>All batch combinations</summary>
+          <div class="table-wrap">
             <table id="comboTable"></table>
           </div>
         </details>

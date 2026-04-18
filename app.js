@@ -247,51 +247,49 @@
       "</p>" +
       "</div>" +
       "</div>" +
-      '<div class="shop-grid">';
+      '<div class="shop-list">';
 
     for (const item of activeItems) {
-      const capeBadge = item.requiresFireCape
-        ? '<span class="shop-card-badge">Cape</span>'
-        : "";
+      const sourceNote = item.requiresFireCape ? "Fire cape shop" : "TzHaar shop";
 
       html +=
-        '<article class="shop-card" data-item-row="' +
+        '<article class="shop-row" data-item-row="' +
         item.id +
         '">' +
         '<input class="catalog-check" type="checkbox" data-item-id="' +
         item.id +
         '" />' +
-        '<button class="shop-card-main" type="button" data-role="toggle-item" data-item-id="' +
+        '<button class="shop-row-main" type="button" data-role="toggle-item" data-item-id="' +
         item.id +
         '">' +
-        '<span class="shop-card-price" data-role="price" data-item-id="' +
-        item.id +
-        '">0</span>' +
-        '<span class="shop-card-stock">x' +
-        item.stock +
-        "</span>" +
-        capeBadge +
-        '<span class="shop-card-checkmark">Selected</span>' +
-        '<span class="shop-card-sprite-wrap">' +
-        '<img class="shop-card-sprite" loading="lazy" src="' +
+        '<span class="shop-row-sprite-wrap">' +
+        '<img class="shop-row-sprite" loading="lazy" src="' +
         escapeHtml(item.spriteUrl) +
         '" alt="' +
         escapeHtml(item.name) +
         '" />' +
         "</span>" +
-        '<span class="shop-card-name" title="' +
+        '<span class="shop-row-name" title="' +
         escapeHtml(item.name) +
-        '">' +
+        '"><strong>' +
         escapeHtml(item.name) +
-        "</span>" +
+        "</strong><span>" +
+        escapeHtml(sourceNote) +
+        "</span></span>" +
         "</button>" +
-        '<div class="shop-card-controls">' +
+        '<div class="shop-row-price" data-role="price" data-item-id="' +
+        item.id +
+        '">0 Tokkul</div>' +
+        '<div class="shop-row-stock">Stock x' +
+        item.stock +
+        "</div>" +
+        '<div class="shop-row-controls">' +
         '<button class="shop-qty-btn" type="button" aria-label="Decrease quantity for ' +
         escapeHtml(item.name) +
         '" title="Decrease quantity" data-role="decrement-item" data-item-id="' +
         item.id +
         '">&#8722;</button>' +
-        '<input class="shop-card-qty" type="number" min="1" step="1" value="1" disabled data-item-id="' +
+        '<input class="shop-row-qty" type="number" min="1" step="1" value="1" disabled data-item-id="' +
         item.id +
         '" />' +
         '<button class="shop-qty-btn" type="button" aria-label="Increase quantity for ' +
@@ -300,9 +298,9 @@
         item.id +
         '">+</button>' +
         "</div>" +
-        '<div class="shop-card-subtotal" data-role="subtotal" data-item-id="' +
+        '<div class="shop-row-subtotal" data-role="subtotal" data-item-id="' +
         item.id +
-        '">Tokkul each</div>' +
+        '">Not selected</div>' +
         "</article>";
     }
 
@@ -315,7 +313,7 @@
 
     for (const item of catalog) {
       const checkbox = document.querySelector('.catalog-check[data-item-id="' + item.id + '"]');
-      const quantityInput = document.querySelector('.shop-card-qty[data-item-id="' + item.id + '"]');
+      const quantityInput = document.querySelector('.shop-row-qty[data-item-id="' + item.id + '"]');
       const priceNode = document.querySelector('[data-role="price"][data-item-id="' + item.id + '"]');
       const subtotalNode = document.querySelector('[data-role="subtotal"][data-item-id="' + item.id + '"]');
       const row = document.querySelector('[data-item-row="' + item.id + '"]');
@@ -336,13 +334,13 @@
       quantityInput.disabled = !cartEntry.checked;
       decrementButton.disabled = !cartEntry.checked;
       row.classList.toggle("selected", cartEntry.checked);
-      priceNode.textContent = formatCompact(unitPrice);
+      priceNode.textContent = formatNumber(unitPrice, "Tokkul");
 
       if (selectedItem) {
         subtotalNode.textContent =
           "x" + selectedItem.quantity + " = " + formatNumber(selectedItem.subtotal, "Tokkul");
       } else {
-        subtotalNode.textContent = formatNumber(unitPrice, "Tokkul each");
+        subtotalNode.textContent = "Not selected";
       }
     }
   }
@@ -374,10 +372,7 @@
     step3NeedTokkul.textContent = formatNumber(cart.totalTokkul, "Tokkul");
     step3BuyBatch.textContent = formatNumber(state.buyBatch);
 
-    const routeMessage =
-      "Current route: " +
-      route.label +
-      ". You can change this later from the report.";
+    const routeMessage = "Route: " + route.label + ". You can change this later from the result.";
     step2RouteNote.textContent = routeMessage;
     step3RouteNote.textContent = routeMessage;
   }
@@ -392,14 +387,15 @@
   }
 
   function renderSummary(route, cart, selectedStrategy, bestStrategy) {
-    const itemLabel = route.itemName.toLowerCase();
+    const itemLabel =
+      route.itemName.toLowerCase() + (selectedStrategy && selectedStrategy.itemsBought === 1 ? "" : "s");
     summaryBuyLabel.textContent = route.itemName + " to buy";
     summarySellLabel.textContent = route.itemName + " to sell";
     reportTargetTokkul.textContent = formatNumber(cart.totalTokkul, "Tokkul");
-    reportSelectedItems.textContent = summarizeSelections(cart);
+    reportSelectedItems.textContent = "Items: " + summarizeSelections(cart);
 
     if (!selectedStrategy || !selectedStrategy.valid) {
-      reportLead.textContent = "No valid report could be produced.";
+      reportLead.textContent = "No valid result";
       reportSub.textContent = "Adjust the route or batch sizes and try again.";
       summaryGp.textContent = "-";
       summaryTokkul.textContent = "-";
@@ -418,20 +414,19 @@
       return;
     }
 
-    reportLead.textContent =
+    reportLead.textContent = "Need " + formatNumber(selectedStrategy.gpSpent, "gp");
+    reportSub.textContent =
       "Buy " +
       formatNumber(selectedStrategy.itemsBought) +
-      " of " +
+      " " +
       itemLabel +
-      " for about " +
-      formatNumber(selectedStrategy.gpSpent, "gp") +
-      ".";
-    reportSub.textContent =
-      "Using buy " +
+      ", then sell " +
+      formatNumber(selectedStrategy.itemsSold) +
+      ". Use buy " +
       selectedStrategy.buyBatch +
       " and sell " +
       selectedStrategy.sellBatch +
-      ", that should reach " +
+      " to reach " +
       formatNumber(selectedStrategy.tokkulReached, "Tokkul") +
       ".";
 
@@ -765,7 +760,7 @@
     });
 
     catalogGroups.addEventListener("input", (event) => {
-      const quantityInput = event.target.closest(".shop-card-qty");
+      const quantityInput = event.target.closest(".shop-row-qty");
       if (!quantityInput) {
         return;
       }
@@ -776,7 +771,7 @@
     });
 
     catalogGroups.addEventListener("change", (event) => {
-      const quantityInput = event.target.closest(".shop-card-qty");
+      const quantityInput = event.target.closest(".shop-row-qty");
       if (!quantityInput) {
         return;
       }
