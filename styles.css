@@ -144,6 +144,14 @@ button {
   gap: 16px;
 }
 
+.catalog-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 7;
+  padding-bottom: 10px;
+  background: var(--bg);
+}
+
 .setup-topline h2,
 .question-panel h2 {
   font-size: 32px;
@@ -206,6 +214,7 @@ button {
   margin-top: 14px;
   overflow-x: auto;
   padding-bottom: 2px;
+  scrollbar-width: thin;
 }
 
 .catalog-tab,
@@ -238,14 +247,14 @@ button {
 
 .catalog-scroll {
   margin-top: 12px;
-  max-height: min(64vh, 560px);
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
 
 .catalog-groups {
-  padding: 2px 0;
+  padding: 2px 0 84px;
 }
 
 .catalog-section-head {
@@ -461,6 +470,15 @@ input[type="number"] {
   align-items: center;
   gap: 12px;
   margin-top: 16px;
+}
+
+.step1-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 8;
+  padding: 12px 0 0;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
 }
 
 .action-btn.primary {
@@ -749,6 +767,10 @@ th {
     align-items: start;
   }
 
+  .catalog-toolbar {
+    padding-bottom: 8px;
+  }
+
   .shop-row {
     grid-template-columns: minmax(0, 1fr) auto auto;
     grid-template-areas:
@@ -813,6 +835,11 @@ th {
     flex-wrap: nowrap;
   }
 
+  .catalog-toolbar {
+    position: static;
+    padding-bottom: 0;
+  }
+
   .shop-row {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -855,6 +882,14 @@ th {
   }
 
   .catalog-scroll {
-    max-height: min(60vh, 520px);
+    max-height: none;
+  }
+
+  .catalog-groups {
+    padding-bottom: 90px;
+  }
+
+  .step1-footer {
+    padding-top: 10px;
   }
 }

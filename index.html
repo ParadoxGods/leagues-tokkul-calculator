@@ -28,29 +28,32 @@
         </div>
 
         <section id="step1View" class="step-view">
-          <div class="setup-topline">
-            <div>
-              <h2>Pick the items you want</h2>
-              <p>Selected items set the Tokkul target automatically.</p>
+          <div class="catalog-toolbar">
+            <div class="setup-topline">
+              <div>
+                <h2>Pick the items you want</h2>
+                <p>Selected items set the Tokkul target automatically.</p>
+              </div>
+              <label class="toggle-inline">
+                <input id="setupGloves" type="checkbox" checked />
+                <span>Karamja gloves prices</span>
+              </label>
             </div>
-            <label class="toggle-inline">
-              <input id="setupGloves" type="checkbox" checked />
-              <span>Karamja gloves prices</span>
-            </label>
+
+            <div class="selection-status">
+              <span><strong id="setupCartTokkulTotal">0 Tokkul</strong> needed</span>
+              <span><strong id="setupCartSelectedItems">0</strong> items</span>
+              <span><strong id="setupCartTotalQuantity">0</strong> total copies</span>
+            </div>
+
+            <div id="catalogTabs" class="catalog-tabs"></div>
           </div>
 
-          <div class="selection-status">
-            <span><strong id="setupCartTokkulTotal">0 Tokkul</strong> needed</span>
-            <span><strong id="setupCartSelectedItems">0</strong> items</span>
-            <span><strong id="setupCartTotalQuantity">0</strong> total copies</span>
-          </div>
-
-          <div id="catalogTabs" class="catalog-tabs"></div>
           <div class="catalog-scroll">
             <div id="catalogGroups" class="catalog-groups"></div>
           </div>
 
-          <div class="footer-bar">
+          <div class="footer-bar step1-footer">
             <p class="helper-copy">Select at least one item to continue.</p>
             <button id="toStep2Btn" class="action-btn primary" type="button">Continue</button>
           </div>

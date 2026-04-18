@@ -113,6 +113,13 @@
     return compactFormatter.format(Math.round(value));
   }
 
+  function scrollToTop(behavior) {
+    window.scrollTo({
+      top: 0,
+      behavior: behavior || "smooth",
+    });
+  }
+
   function getCartEntry(itemId) {
     if (!cartState.has(itemId)) {
       cartState.set(itemId, { checked: false, quantity: 1 });
@@ -630,6 +637,7 @@
       state.reportVisible = true;
       setupView.classList.remove("is-transitioning-out");
       render();
+      scrollToTop();
     }, TRANSITION_MS);
   }
 
@@ -686,21 +694,25 @@
       }
       state.step = 2;
       render();
+      scrollToTop();
     });
 
     backToStep1Btn.addEventListener("click", () => {
       state.step = 1;
       render();
+      scrollToTop();
     });
 
     toStep3Btn.addEventListener("click", () => {
       state.step = 3;
       render();
+      scrollToTop();
     });
 
     backToStep2Btn.addEventListener("click", () => {
       state.step = 2;
       render();
+      scrollToTop();
     });
 
     showReportBtn.addEventListener("click", startReportTransition);
@@ -714,6 +726,7 @@
       state.step = 1;
       setupView.classList.remove("is-transitioning-out");
       render();
+      scrollToTop();
     });
 
     catalogTabs.addEventListener("click", (event) => {
