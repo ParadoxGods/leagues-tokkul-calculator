@@ -267,7 +267,7 @@ button {
 
 .shop-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) 90px 72px 124px 150px;
+  grid-template-columns: minmax(0, 1.7fr) 90px 72px 150px;
   gap: 10px;
   align-items: center;
   padding: 10px 8px;
@@ -279,7 +279,9 @@ button {
 }
 
 .shop-row.selected {
-  background: rgba(213, 181, 125, 0.08);
+  grid-template-columns: minmax(0, 1.7fr) 90px 72px 124px 150px;
+  background: rgba(121, 212, 111, 0.1);
+  box-shadow: inset 3px 0 0 var(--money);
 }
 
 .catalog-check {
@@ -302,7 +304,18 @@ button {
 }
 
 .shop-row.selected .shop-row-main {
-  color: var(--accent);
+  color: var(--money);
+}
+
+.shop-row.selected .shop-row-name strong,
+.shop-row.selected .shop-row-price,
+.shop-row.selected .shop-row-subtotal {
+  color: var(--money);
+}
+
+.shop-row.selected .shop-row-sprite-wrap {
+  border-color: var(--money);
+  box-shadow: 0 0 10px var(--money-soft);
 }
 
 .shop-row-sprite-wrap {
@@ -364,10 +377,14 @@ button {
 }
 
 .shop-row-controls {
-  display: grid;
+  display: none;
   grid-template-columns: 32px minmax(0, 1fr) 32px;
   gap: 6px;
   align-items: center;
+}
+
+.shop-row.selected .shop-row-controls {
+  display: grid;
 }
 
 .shop-qty-btn {
@@ -709,6 +726,10 @@ th {
     grid-template-columns: minmax(0, 1fr) 90px 72px;
   }
 
+  .shop-row.selected {
+    grid-template-columns: minmax(0, 1fr) 90px 72px;
+  }
+
   .shop-row-controls,
   .shop-row-subtotal {
     grid-column: span 3;
@@ -752,6 +773,10 @@ th {
   .shop-row {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .shop-row.selected {
+    grid-template-columns: 1fr;
   }
 
   .shop-row-price,
