@@ -28,34 +28,54 @@
         </div>
 
         <section id="step1View" class="step-view">
-          <div class="catalog-toolbar">
-            <div class="setup-topline">
-              <div>
-                <h2>Pick the items you want</h2>
-                <p>Selected items set the Tokkul target automatically.</p>
+          <div class="osrs-shop-window">
+            <div class="osrs-shop-top">
+              <div class="osrs-shop-heading">
+                <span class="osrs-window-kicker">Shop setup</span>
+                <h2 id="activeStoreTitle">TzHaar-Mej-Roh's Rune Store</h2>
+                <p id="activeStoreNote">Pick items from the shop stock to build your Tokkul plan.</p>
               </div>
-              <label class="toggle-inline">
+
+              <label class="toggle-inline osrs-gloves-toggle">
                 <input id="setupGloves" type="checkbox" checked />
                 <span>Karamja gloves prices</span>
               </label>
             </div>
 
-            <div class="selection-status">
-              <span><strong id="setupCartTokkulTotal">0 Tokkul</strong> needed</span>
-              <span><strong id="setupCartSelectedItems">0</strong> items</span>
-              <span><strong id="setupCartTotalQuantity">0</strong> total copies</span>
+            <div id="catalogTabs" class="osrs-shop-tabs"></div>
+
+            <div class="osrs-shop-body">
+              <section class="osrs-stock-panel">
+                <div class="osrs-panel-title">Shop stock</div>
+                <div id="catalogGroups" class="osrs-stock-grid"></div>
+              </section>
+
+              <aside class="osrs-plan-panel">
+                <div class="osrs-panel-title">Your plan</div>
+
+                <div class="osrs-plan-summary">
+                  <div class="osrs-plan-stat">
+                    <span>Tokkul needed</span>
+                    <strong id="setupCartTokkulTotal">0 Tokkul</strong>
+                  </div>
+                  <div class="osrs-plan-stat">
+                    <span>Selected items</span>
+                    <strong id="setupCartSelectedItems">0</strong>
+                  </div>
+                  <div class="osrs-plan-stat">
+                    <span>Total copies</span>
+                    <strong id="setupCartTotalQuantity">0</strong>
+                  </div>
+                </div>
+
+                <div id="selectedItemsList" class="osrs-selected-list"></div>
+              </aside>
             </div>
 
-            <div id="catalogTabs" class="catalog-tabs"></div>
-          </div>
-
-          <div class="catalog-scroll">
-            <div id="catalogGroups" class="catalog-groups"></div>
-          </div>
-
-          <div class="footer-bar step1-footer">
-            <p class="helper-copy">Select at least one item to continue.</p>
-            <button id="toStep2Btn" class="action-btn primary" type="button">Continue</button>
+            <div class="osrs-shop-footer">
+              <p class="helper-copy">Select at least one item to continue.</p>
+              <button id="toStep2Btn" class="action-btn primary" type="button">Continue</button>
+            </div>
           </div>
         </section>
 

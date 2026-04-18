@@ -48,6 +48,9 @@
   const comboTable = document.getElementById("comboTable");
   const catalogTabs = document.getElementById("catalogTabs");
   const catalogGroups = document.getElementById("catalogGroups");
+  const selectedItemsList = document.getElementById("selectedItemsList");
+  const activeStoreTitle = document.getElementById("activeStoreTitle");
+  const activeStoreNote = document.getElementById("activeStoreNote");
   const reportLead = document.getElementById("reportLead");
   const reportSub = document.getElementById("reportSub");
   const reportTargetTokkul = document.getElementById("reportTargetTokkul");
@@ -240,78 +243,49 @@
 
     const activeItems = stores.get(activeStoreName) || [];
     const requiresFireCape = activeItems.some((item) => item.requiresFireCape);
-    const note = requiresFireCape ? "Fire cape required for this store." : "Outer city store.";
+    const note = requiresFireCape
+      ? "Fire cape required. Click items from stock to add them to your plan."
+      : "Click items from stock to add them to your plan.";
 
-    let html =
-      '<section class="catalog-section">' +
-      '<div class="catalog-section-head">' +
-      "<div>" +
-      "<h4>" +
-      escapeHtml(activeStoreName) +
-      "</h4>" +
-      "<p>" +
-      escapeHtml(note) +
-      "</p>" +
-      "</div>" +
-      "</div>" +
-      '<div class="shop-list">';
+    activeStoreTitle.textContent = activeStoreName || "TzHaar shop";
+    activeStoreNote.textContent = note;
+
+    let html = '<div class="osrs-stock-slots">';
 
     for (const item of activeItems) {
-      const sourceNote = item.requiresFireCape ? "Fire cape shop" : "TzHaar shop";
-
       html +=
-        '<article class="shop-row" data-item-row="' +
+        '<article class="osrs-stock-slot" data-item-row="' +
         item.id +
         '">' +
         '<input class="catalog-check" type="checkbox" data-item-id="' +
         item.id +
         '" />' +
-        '<button class="shop-row-main" type="button" data-role="toggle-item" data-item-id="' +
+        '<button class="osrs-stock-slot-button" type="button" data-role="toggle-item" data-item-id="' +
         item.id +
         '">' +
-        '<span class="shop-row-sprite-wrap">' +
-        '<img class="shop-row-sprite" loading="lazy" src="' +
+        '<span class="osrs-slot-stock">x' +
+        item.stock +
+        "</span>" +
+        '<span class="osrs-slot-sprite-wrap">' +
+        '<img class="osrs-slot-sprite" loading="lazy" src="' +
         escapeHtml(item.spriteUrl) +
         '" alt="' +
         escapeHtml(item.name) +
         '" />' +
         "</span>" +
-        '<span class="shop-row-name" title="' +
+        '<span class="osrs-slot-price" data-role="price" data-item-id="' +
+        item.id +
+        '">0</span>' +
+        '<span class="osrs-slot-name" title="' +
         escapeHtml(item.name) +
-        '"><strong>' +
+        '">' +
         escapeHtml(item.name) +
-        "</strong><span>" +
-        escapeHtml(sourceNote) +
         "</span></span>" +
         "</button>" +
-        '<div class="shop-row-price" data-role="price" data-item-id="' +
-        item.id +
-        '">0 Tokkul</div>' +
-        '<div class="shop-row-stock">Stock x' +
-        item.stock +
-        "</div>" +
-        '<div class="shop-row-controls">' +
-        '<button class="shop-qty-btn" type="button" aria-label="Decrease quantity for ' +
-        escapeHtml(item.name) +
-        '" title="Decrease quantity" data-role="decrement-item" data-item-id="' +
-        item.id +
-        '">&#8722;</button>' +
-        '<input class="shop-row-qty" type="number" min="1" step="1" value="1" disabled data-item-id="' +
-        item.id +
-        '" />' +
-        '<button class="shop-qty-btn" type="button" aria-label="Increase quantity for ' +
-        escapeHtml(item.name) +
-        '" title="Increase quantity" data-role="increment-item" data-item-id="' +
-        item.id +
-        '">+</button>' +
-        "</div>" +
-        '<div class="shop-row-subtotal" data-role="subtotal" data-item-id="' +
-        item.id +
-        '">Not selected</div>' +
         "</article>";
     }
 
-    html += "</div></section>";
+    html += "</div>";
     catalogGroups.innerHTML = html;
   }
 
@@ -320,36 +294,81 @@
 
     for (const item of catalog) {
       const checkbox = document.querySelector('.catalog-check[data-item-id="' + item.id + '"]');
-      const quantityInput = document.querySelector('.shop-row-qty[data-item-id="' + item.id + '"]');
       const priceNode = document.querySelector('[data-role="price"][data-item-id="' + item.id + '"]');
-      const subtotalNode = document.querySelector('[data-role="subtotal"][data-item-id="' + item.id + '"]');
       const row = document.querySelector('[data-item-row="' + item.id + '"]');
-      const decrementButton = document.querySelector(
-        '[data-role="decrement-item"][data-item-id="' + item.id + '"]'
-      );
 
-      if (!checkbox || !quantityInput || !priceNode || !subtotalNode || !row || !decrementButton) {
+      if (!checkbox || !priceNode || !row) {
         continue;
       }
 
       const cartEntry = getCartEntry(item.id);
-      const selectedItem = selectedById.get(item.id);
       const unitPrice = state.useKaramjaGloves ? item.priceWithGloves : item.priceWithoutGloves;
 
       checkbox.checked = cartEntry.checked;
-      quantityInput.value = String(cartEntry.quantity);
-      quantityInput.disabled = !cartEntry.checked;
-      decrementButton.disabled = !cartEntry.checked;
       row.classList.toggle("selected", cartEntry.checked);
-      priceNode.textContent = formatNumber(unitPrice, "Tokkul");
-
-      if (selectedItem) {
-        subtotalNode.textContent =
-          "x" + selectedItem.quantity + " = " + formatNumber(selectedItem.subtotal, "Tokkul");
-      } else {
-        subtotalNode.textContent = "Not selected";
-      }
+      priceNode.textContent = formatCompact(unitPrice);
     }
+
+    renderSelectedItems(cart);
+  }
+
+  function renderSelectedItems(cart) {
+    if (!cart.breakdown.length) {
+      selectedItemsList.innerHTML =
+        '<div class="osrs-empty-plan">' +
+        "<strong>No items selected</strong>" +
+        "<span>Pick items from the shop stock on the left.</span>" +
+        "</div>";
+      return;
+    }
+
+    let html = "";
+    for (const item of cart.breakdown) {
+      html +=
+        '<article class="osrs-selected-item">' +
+        '<div class="osrs-selected-main">' +
+        '<span class="osrs-selected-sprite-wrap">' +
+        '<img class="osrs-selected-sprite" loading="lazy" src="' +
+        escapeHtml(item.spriteUrl) +
+        '" alt="' +
+        escapeHtml(item.name) +
+        '" />' +
+        "</span>" +
+        '<div class="osrs-selected-copy">' +
+        "<strong>" +
+        escapeHtml(item.name) +
+        "</strong>" +
+        "<span>" +
+        formatNumber(item.subtotal, "Tokkul") +
+        "</span>" +
+        "</div>" +
+        "</div>" +
+        '<div class="osrs-selected-controls">' +
+        '<button class="shop-qty-btn" type="button" aria-label="Decrease quantity for ' +
+        escapeHtml(item.name) +
+        '" title="Decrease quantity" data-role="decrement-item" data-item-id="' +
+        item.id +
+        '">&#8722;</button>' +
+        '<input class="selected-item-qty" type="number" min="1" step="1" value="' +
+        item.quantity +
+        '" data-item-id="' +
+        item.id +
+        '" />' +
+        '<button class="shop-qty-btn" type="button" aria-label="Increase quantity for ' +
+        escapeHtml(item.name) +
+        '" title="Increase quantity" data-role="increment-item" data-item-id="' +
+        item.id +
+        '">+</button>' +
+        '<button class="osrs-remove-btn" type="button" aria-label="Remove ' +
+        escapeHtml(item.name) +
+        '" title="Remove item" data-role="remove-item" data-item-id="' +
+        item.id +
+        '">X</button>' +
+        "</div>" +
+        "</article>";
+    }
+
+    selectedItemsList.innerHTML = html;
   }
 
   function renderSetup(cart, route) {
@@ -748,9 +767,10 @@
           entry.quantity = 1;
         }
         render();
-        return;
       }
+    });
 
+    selectedItemsList.addEventListener("click", (event) => {
       const incrementButton = event.target.closest('[data-role="increment-item"]');
       if (incrementButton) {
         const entry = getCartEntry(incrementButton.dataset.itemId);
@@ -769,11 +789,20 @@
           entry.quantity = current - 1;
         }
         render();
+        return;
+      }
+
+      const removeButton = event.target.closest('[data-role="remove-item"]');
+      if (removeButton) {
+        const entry = getCartEntry(removeButton.dataset.itemId);
+        entry.checked = false;
+        entry.quantity = 1;
+        render();
       }
     });
 
-    catalogGroups.addEventListener("input", (event) => {
-      const quantityInput = event.target.closest(".shop-row-qty");
+    selectedItemsList.addEventListener("input", (event) => {
+      const quantityInput = event.target.closest(".selected-item-qty");
       if (!quantityInput) {
         return;
       }
@@ -783,8 +812,8 @@
       entry.quantity = engine.clampPositiveInteger(quantityInput.value, 1);
     });
 
-    catalogGroups.addEventListener("change", (event) => {
-      const quantityInput = event.target.closest(".shop-row-qty");
+    selectedItemsList.addEventListener("change", (event) => {
+      const quantityInput = event.target.closest(".selected-item-qty");
       if (!quantityInput) {
         return;
       }

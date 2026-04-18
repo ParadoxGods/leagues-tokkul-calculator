@@ -144,14 +144,6 @@ button {
   gap: 16px;
 }
 
-.catalog-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 7;
-  padding-bottom: 10px;
-  background: var(--bg);
-}
-
 .setup-topline h2,
 .question-panel h2 {
   font-size: 32px;
@@ -170,6 +162,318 @@ button {
 
 .setup-topline p {
   margin-top: 6px;
+}
+
+.osrs-shop-window {
+  margin-top: 12px;
+  padding: 12px;
+  border: 3px solid #6f624f;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 24%),
+    linear-gradient(180deg, #362d22, #241d16 18%, #1f1a14);
+  box-shadow:
+    inset 0 0 0 2px #1a140f,
+    inset 0 0 0 4px #90785a;
+}
+
+.osrs-shop-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+}
+
+.osrs-shop-heading h2 {
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.osrs-shop-heading p {
+  margin-top: 4px;
+  color: #cabca6;
+}
+
+.osrs-window-kicker,
+.osrs-panel-title {
+  color: #d8c08a;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.osrs-window-kicker {
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+.osrs-gloves-toggle {
+  min-height: 40px;
+  border-color: #8b7758;
+  background: #2a221a;
+}
+
+.osrs-shop-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.osrs-shop-tabs .catalog-tab {
+  min-height: 34px;
+  padding: 7px 10px;
+  border-color: #8b7758;
+  background: #2a221a;
+}
+
+.osrs-shop-tabs .catalog-tab.active {
+  background: rgba(213, 181, 125, 0.18);
+}
+
+.osrs-shop-body {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 360px);
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.osrs-stock-panel,
+.osrs-plan-panel {
+  min-width: 0;
+  padding: 10px;
+  border: 2px solid #7c6b54;
+  background: #1e1812;
+  box-shadow: inset 0 0 0 1px #0f0b08;
+}
+
+.osrs-panel-title {
+  margin-bottom: 10px;
+}
+
+.osrs-stock-grid {
+  min-width: 0;
+}
+
+.osrs-stock-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+.osrs-stock-slot {
+  min-width: 0;
+}
+
+.osrs-stock-slot-button {
+  position: relative;
+  display: grid;
+  grid-template-rows: 58px minmax(30px, auto);
+  gap: 8px;
+  width: 100%;
+  min-height: 118px;
+  padding: 22px 8px 10px;
+  border: 2px solid #6b5b46;
+  background: linear-gradient(180deg, #342c21, #201912 34%, #19130e);
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px #100c09;
+}
+
+.osrs-stock-slot.selected .osrs-stock-slot-button {
+  border-color: #89d36f;
+  background: linear-gradient(180deg, #38412a, #222117 34%, #19130e);
+  box-shadow: inset 0 0 0 1px rgba(121, 212, 111, 0.2), 0 0 10px rgba(121, 212, 111, 0.12);
+}
+
+.osrs-slot-stock,
+.osrs-slot-price {
+  position: absolute;
+  top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.osrs-slot-stock {
+  left: 6px;
+  color: #d7ceb8;
+}
+
+.osrs-slot-price {
+  right: 6px;
+  color: #d9b66f;
+}
+
+.osrs-slot-sprite-wrap {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto;
+  border: 1px solid #5d503f;
+  background: #15100b;
+}
+
+.osrs-slot-sprite {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.osrs-slot-name {
+  display: -webkit-box;
+  min-height: 2.5em;
+  color: #e9e2d2;
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.osrs-plan-summary {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #4b3f32;
+}
+
+.osrs-plan-stat {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.osrs-plan-stat span,
+.osrs-selected-copy span,
+.osrs-empty-plan span {
+  color: #c1b29a;
+}
+
+.osrs-plan-stat strong {
+  color: #efe8d8;
+  font-size: 18px;
+}
+
+.osrs-selected-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.osrs-empty-plan {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid #4b3f32;
+  background: #17120d;
+}
+
+.osrs-empty-plan strong {
+  color: #efe8d8;
+}
+
+.osrs-selected-item {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #5b4d3b;
+  background: #17120d;
+}
+
+.osrs-selected-main {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.osrs-selected-sprite-wrap {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #5d503f;
+  background: #100c09;
+}
+
+.osrs-selected-sprite {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.osrs-selected-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.osrs-selected-copy strong {
+  color: #efe8d8;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.osrs-selected-controls {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 32px 32px;
+  gap: 6px;
+  align-items: center;
+}
+
+.selected-item-qty {
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 8px;
+  border: 1px solid #7b684f;
+  background: #251d15;
+  color: #efe8d8;
+  text-align: center;
+  font-weight: 700;
+}
+
+.selected-item-qty::-webkit-outer-spin-button,
+.selected-item-qty::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.selected-item-qty[type="number"] {
+  appearance: textfield;
+}
+
+.osrs-remove-btn {
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid #7b684f;
+  background: #291c15;
+  color: #d7c7b2;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.osrs-stock-slot-button:hover,
+.osrs-remove-btn:hover {
+  border-color: #d5b57d;
+}
+
+.osrs-shop-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid #5b4d3b;
 }
 
 .toggle-inline {
@@ -507,9 +811,10 @@ input[type="number"] {
 .catalog-tab:focus-visible,
 .action-btn:focus-visible,
 .batch-choice-grid button:focus-visible,
-.shop-row-main:focus-visible,
+.osrs-stock-slot-button:focus-visible,
 .shop-qty-btn:focus-visible,
-.shop-row-qty:focus-visible,
+.selected-item-qty:focus-visible,
+.osrs-remove-btn:focus-visible,
 .field-inline select:focus-visible,
 .field-inline input:focus-visible,
 .toggle-inline:focus-within {
@@ -762,38 +1067,27 @@ th {
 
 @media (max-width: 960px) {
   .setup-topline,
+  .osrs-shop-top,
   .footer-bar {
     flex-direction: column;
     align-items: start;
   }
 
-  .catalog-toolbar {
-    padding-bottom: 8px;
+  .osrs-shop-body {
+    grid-template-columns: 1fr;
   }
 
-  .shop-row {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    grid-template-areas:
-      "main price stock"
-      "subtotal subtotal subtotal";
-    row-gap: 8px;
+  .osrs-plan-panel {
+    max-width: none;
   }
 
-  .shop-row.selected {
-    grid-template-columns: minmax(0, 1fr) minmax(144px, 180px) minmax(110px, 1fr);
-    grid-template-areas:
-      "main price stock"
-      "controls controls subtotal";
+  .osrs-stock-slots {
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
   }
 
-  .shop-row-price,
-  .shop-row-stock {
-    text-align: right;
-  }
-
-  .shop-row-subtotal {
-    justify-self: start;
-    text-align: left;
+  .osrs-shop-footer {
+    flex-direction: column;
+    align-items: start;
   }
 
   .result-strip,
@@ -831,65 +1125,54 @@ th {
     grid-column: span 1;
   }
 
-  .catalog-tabs {
+  .osrs-shop-window {
+    padding: 10px;
+  }
+
+  .osrs-shop-heading h2,
+  .question-panel h2 {
+    font-size: 24px;
+  }
+
+  .osrs-shop-tabs {
     flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
   }
 
-  .catalog-toolbar {
-    position: static;
-    padding-bottom: 0;
+  .osrs-shop-body {
+    gap: 10px;
   }
 
-  .shop-row {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "main"
-      "price"
-      "stock"
-      "subtotal";
-    gap: 6px;
-    padding: 12px 6px;
+  .osrs-stock-slots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
   }
 
-  .shop-row.selected {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "main"
-      "price"
-      "stock"
-      "subtotal"
-      "controls";
+  .osrs-stock-slot-button {
+    min-height: 102px;
+    padding: 20px 6px 8px;
   }
 
-  .shop-row-main {
-    grid-template-columns: 56px minmax(0, 1fr);
-    align-items: start;
+  .osrs-slot-sprite-wrap {
+    width: 50px;
+    height: 50px;
   }
 
-  .shop-row-name strong {
-    -webkit-line-clamp: 3;
+  .osrs-slot-sprite {
+    width: 38px;
+    height: 38px;
   }
 
-  .shop-row-price,
-  .shop-row-stock,
-  .shop-row-subtotal {
-    justify-self: start;
-    text-align: left;
-  }
-
-  .shop-row-controls {
-    max-width: 240px;
-  }
-
-  .catalog-scroll {
+  .osrs-selected-list {
     max-height: none;
   }
 
-  .catalog-groups {
-    padding-bottom: 90px;
+  .osrs-selected-controls {
+    grid-template-columns: 32px minmax(0, 1fr) 32px 32px;
   }
 
-  .step1-footer {
-    padding-top: 10px;
+  .osrs-shop-footer {
+    margin-top: 12px;
   }
 }
