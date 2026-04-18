@@ -2,6 +2,8 @@
 
 Simple local GUI for estimating how much GP you need to turn into a target amount of Tokkul under a pinned-stock assumption.
 
+Live page: https://paradoxgods.github.io/leagues-tokkul-calculator/
+
 ## What it does
 
 - Calculates shop prices with OSRS stock-based pricing instead of using flat item costs.
